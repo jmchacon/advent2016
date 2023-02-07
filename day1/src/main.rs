@@ -3,6 +3,7 @@ use crate::Direction::{East, North, South, West};
 use clap::Parser;
 use color_eyre::eyre::Result;
 use grid::Location;
+use std::collections::HashSet;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
@@ -37,6 +38,8 @@ fn main() -> Result<()> {
 
     let mut loc = Location(0, 0);
     let mut dir = North;
+    let mut visited = HashSet::new();
+    let mut part2 = None;
 
     for (line_num, line) in lines.iter().enumerate() {
         let parts = line.split(", ").collect::<Vec<_>>();
@@ -71,17 +74,51 @@ fn main() -> Result<()> {
                 }
                 _ => panic!("{} - bad direction {p} for line {line}", line_num + 1),
             }
+            let mut newloc = loc.clone();
             loc = match dir {
-                North => Location(loc.0, loc.1 + num),
-                South => Location(loc.0, loc.1 - num),
-                East => Location(loc.0 + num, loc.1),
-                West => Location(loc.0 - num, loc.1),
+                North => {
+                    for _ in 0..num {
+                        newloc = Location(newloc.0, newloc.1 + 1);
+                        check_part2(&mut visited, &mut newloc, &mut part2);
+                    }
+                    newloc
+                }
+                South => {
+                    for _ in 0..num {
+                        newloc = Location(newloc.0, newloc.1 - 1);
+                        check_part2(&mut visited, &mut newloc, &mut part2);
+                    }
+                    newloc
+                }
+                East => {
+                    for _ in 0..num {
+                        newloc = Location(newloc.0 + 1, newloc.1);
+                        check_part2(&mut visited, &mut newloc, &mut part2);
+                    }
+                    newloc
+                }
+                West => {
+                    for _ in 0..num {
+                        newloc = Location(newloc.0 - 1, newloc.1);
+                        check_part2(&mut visited, &mut newloc, &mut part2);
+                    }
+                    newloc
+                }
             };
             if args.debug {
-                println!("{loc}");
+                println!("{dir} - {loc}");
             }
         }
     }
     println!("part1: {}", Location(0, 0).distance(&loc));
+    println!("part2: {}", part2.unwrap());
     Ok(())
+}
+
+fn check_part2(visited: &mut HashSet<Location>, newloc: &Location, part2: &mut Option<u32>) {
+    if visited.contains(&newloc) && part2.is_none() {
+        println!("part2: {newloc}");
+        *part2 = Some(Location(0, 0).distance(&newloc));
+    }
+    visited.insert(newloc.clone());
 }
