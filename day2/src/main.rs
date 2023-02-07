@@ -35,7 +35,7 @@ enum Move {
 struct Keypad(u32);
 
 impl Keypad {
-    fn mv(&mut self, direction: Move) {
+    fn mv(&mut self, direction: &Move) {
         self.0 = match direction {
             Move::Up => match self.0 {
                 1 | 2 | 3 => self.0,
@@ -91,7 +91,7 @@ impl Keypad {
 struct StrangeKeypad(u32);
 
 impl StrangeKeypad {
-    fn mv(&mut self, direction: Move) {
+    fn mv(&mut self, direction: &Move) {
         self.0 = match direction {
             Move::Up => match self.0 {
                 1 | 2 | 4 | 5 | 9 => self.0,
@@ -161,16 +161,20 @@ fn main() -> Result<()> {
         for c in line.chars() {
             match c {
                 'U' => {
-                    (kp.mv(Up), strange_kp.mv(Up));
+                    kp.mv(&Up);
+                    strange_kp.mv(&Up);
                 }
                 'D' => {
-                    (kp.mv(Down), strange_kp.mv(Down));
+                    kp.mv(&Down);
+                    strange_kp.mv(&Down);
                 }
                 'L' => {
-                    (kp.mv(Left), strange_kp.mv(Left));
+                    kp.mv(&Left);
+                    strange_kp.mv(&Left);
                 }
                 'R' => {
-                    (kp.mv(Right), strange_kp.mv(Right));
+                    kp.mv(&Right);
+                    strange_kp.mv(&Right);
                 }
                 _ => panic!("{} - bad line {line}", line_num + 1),
             }
