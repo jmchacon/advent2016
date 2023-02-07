@@ -33,6 +33,8 @@ fn main() -> Result<()> {
         let b = parts[1].parse::<u32>().unwrap();
         let c = parts[2].parse::<u32>().unwrap();
 
+        // If these are lengths of the side of a triangle then 2 sides must
+        // be bigger than the third.
         if a + b > c && a + c > b && b + c > a {
             count += 1;
         }
