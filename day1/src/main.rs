@@ -42,8 +42,8 @@ fn main() -> Result<()> {
     let mut part2 = None;
 
     for (line_num, line) in lines.iter().enumerate() {
-        let parts = line.split(", ").collect::<Vec<_>>();
-        for p in parts.iter().cloned() {
+        let directions = line.split(", ").collect::<Vec<_>>();
+        for p in &directions {
             if args.debug {
                 println!("{p}");
             }
@@ -53,7 +53,7 @@ fn main() -> Result<()> {
                 line_num + 1
             );
             let mut chars = p.chars();
-            let turn = chars.nth(0).unwrap();
+            let turn = chars.next().unwrap();
             let num = chars.as_str().parse::<isize>().unwrap();
             match turn {
                 'L' => {
@@ -79,28 +79,28 @@ fn main() -> Result<()> {
                 North => {
                     for _ in 0..num {
                         newloc = Location(newloc.0, newloc.1 + 1);
-                        check_part2(&mut visited, &mut newloc, &mut part2);
+                        check_part2(&mut visited, &newloc, &mut part2, args.debug);
                     }
                     newloc
                 }
                 South => {
                     for _ in 0..num {
                         newloc = Location(newloc.0, newloc.1 - 1);
-                        check_part2(&mut visited, &mut newloc, &mut part2);
+                        check_part2(&mut visited, &newloc, &mut part2, args.debug);
                     }
                     newloc
                 }
                 East => {
                     for _ in 0..num {
                         newloc = Location(newloc.0 + 1, newloc.1);
-                        check_part2(&mut visited, &mut newloc, &mut part2);
+                        check_part2(&mut visited, &newloc, &mut part2, args.debug);
                     }
                     newloc
                 }
                 West => {
                     for _ in 0..num {
                         newloc = Location(newloc.0 - 1, newloc.1);
-                        check_part2(&mut visited, &mut newloc, &mut part2);
+                        check_part2(&mut visited, &newloc, &mut part2, args.debug);
                     }
                     newloc
                 }
@@ -115,10 +115,17 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn check_part2(visited: &mut HashSet<Location>, newloc: &Location, part2: &mut Option<u32>) {
-    if visited.contains(&newloc) && part2.is_none() {
-        println!("part2: {newloc}");
-        *part2 = Some(Location(0, 0).distance(&newloc));
+fn check_part2(
+    visited: &mut HashSet<Location>,
+    newloc: &Location,
+    part2: &mut Option<u32>,
+    debug: bool,
+) {
+    if visited.contains(newloc) && part2.is_none() {
+        if debug {
+            println!("part2: {newloc}");
+        }
+        *part2 = Some(Location(0, 0).distance(newloc));
     }
     visited.insert(newloc.clone());
 }
