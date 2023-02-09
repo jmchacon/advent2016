@@ -27,6 +27,7 @@ fn main() -> Result<()> {
     let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
 
     let mut real = 0;
+    let mut part2 = 0;
     for (line_num, line) in lines.iter().enumerate() {
         let mut names = HashMap::new();
 
@@ -94,10 +95,36 @@ fn main() -> Result<()> {
             if args.debug {
                 println!("real - {line}");
             }
-            let id = sector_id.as_str().parse::<i32>().unwrap();
+            let id = sector_id.as_str().parse::<u32>().unwrap();
             real += id;
+
+            let mut decrypt = String::new();
+
+            for c in line.chars() {
+                match c {
+                    'a'..='z' => {
+                        let new =
+                            std::char::from_u32((c as u32 - 'a' as u32 + id) % 26 + 'a' as u32)
+                                .unwrap();
+                        write!(decrypt, "{new}").unwrap();
+                    }
+                    '-' => {
+                        write!(decrypt, " ").unwrap();
+                    }
+                    _ => {
+                        write!(decrypt, "{c}").unwrap();
+                    }
+                }
+            }
+            if decrypt.starts_with("northpole object storage") {
+                part2 = id;
+            }
+            if args.debug {
+                println!("decrypt: {decrypt}");
+            }
         }
     }
     println!("part1: {real}");
+    println!("part2: {part2}");
     Ok(())
 }
