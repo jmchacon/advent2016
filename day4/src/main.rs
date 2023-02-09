@@ -62,13 +62,20 @@ fn main() -> Result<()> {
 
         let mut is_real = true;
         for i in 0..checksum.chars().count() - 1 {
+            // Don't do anything if both this char and the next aren't in the map
+            // we assembled.
             if names.contains_key(&checksum.chars().nth(i).unwrap()) {
                 if names.contains_key(&checksum.chars().nth(i + 1).unwrap()) {
+                    // Now check if the current is bigger than the next. If so, golden.
+                    // NOTE: Using nth() over and over isn't efficient but these are also
+                    //       tiny strings...
                     let x = names.get(&checksum.chars().nth(i).unwrap()).unwrap();
                     let y = names.get(&checksum.chars().nth(i + 1).unwrap()).unwrap();
                     if x > y {
                         continue;
                     } else if x == y {
+                        // If instead the 2 chars have equal counts make sure they are in the
+                        // checksum in alphabetical order.
                         let c1 = checksum.chars().nth(i).unwrap();
                         let c2 = checksum.chars().nth(i + 1).unwrap();
                         if args.debug {
@@ -80,6 +87,7 @@ fn main() -> Result<()> {
                     }
                 }
             }
+            // If we didn't pass this is a decoy.
             is_real = false;
         }
         if is_real {
