@@ -31,37 +31,33 @@ fn main() -> Result<()> {
         let (mut part1, mut part2) = (false, false);
         loop {
             let digest = md5::compute(format!("{line}{cur}"));
-
-            match format!("{digest:x}").as_bytes() {
-                [b'0', b'0', b'0', b'0', b'0', x, y, ..] => {
-                    // part2 is a little trickier. x is the position for y in part
-                    // but x must be 0..7 and y must not have been filled in yet.
-                    // So compute this by subtracting 0x30 off since this is ASCII
-                    // and the numbers are below the letters so gives us an easy range check.
-                    let num = usize::from(*x - 0x30);
-                    if args.debug {
-                        println!("Found at {cur} {digest:x} - {num}");
-                    }
-                    if pos < pass.len() {
-                        pass[pos] = *x;
-                        pos += 1;
-                        if pos >= pass.len() {
-                            part1 = true;
-                        }
-                    }
-
-                    if num < 8 && pass2[num] == 255 {
-                        if args.debug {
-                            println!("part2 found {num} for {digest:x}");
-                        }
-                        pass2[num] = *y;
-                        pos2 += 1;
-                    }
-                    if pos2 >= pass2.len() {
-                        part2 = true;
+            if let [b'0', b'0', b'0', b'0', b'0', x, y, ..] = format!("{digest:x}").as_bytes() {
+                // part2 is a little trickier. x is the position for y in part
+                // but x must be 0..7 and y must not have been filled in yet.
+                // So compute this by subtracting 0x30 off since this is ASCII
+                // and the numbers are below the letters so gives us an easy range check.
+                let num = usize::from(*x - 0x30);
+                if args.debug {
+                    println!("Found at {cur} {digest:x} - {num}");
+                }
+                if pos < pass.len() {
+                    pass[pos] = *x;
+                    pos += 1;
+                    if pos >= pass.len() {
+                        part1 = true;
                     }
                 }
-                _ => {}
+
+                if num < 8 && pass2[num] == 255 {
+                    if args.debug {
+                        println!("part2 found {num} for {digest:x}");
+                    }
+                    pass2[num] = *y;
+                    pos2 += 1;
+                }
+                if pos2 >= pass2.len() {
+                    part2 = true;
+                }
             }
             cur += 1;
             if part1 && part2 {
