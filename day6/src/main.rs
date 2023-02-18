@@ -25,8 +25,11 @@ fn main() -> Result<()> {
     let file = File::open(filename)?;
     let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
 
+    // Going to track letter occurance by column.
+    // This means each line is the same length and we just need a vec of hashes to represent
+    // each char in that column.
     let mut cols = Vec::new();
-    let size = lines.iter().next().unwrap().len();
+    let size = lines.first().unwrap().len();
     for _ in 0..size {
         cols.push(HashMap::new());
     }
@@ -41,14 +44,8 @@ fn main() -> Result<()> {
     }
     let mut out = Vec::new();
     for c in &cols {
-        let best = c
-            .iter()
-            .map(|(k, v)| (v, k))
-            .collect::<Vec<_>>()
-            .iter()
-            .max()
-            .unwrap()
-            .clone();
+        // Loop over the hash, invert it and then find the max and insert that char.
+        let best = c.iter().map(|(k, v)| (v, k)).max().unwrap();
         out.push(*best.1);
     }
     println!("part1: {}", core::str::from_utf8(&out).unwrap());
