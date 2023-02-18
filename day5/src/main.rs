@@ -26,7 +26,9 @@ fn main() -> Result<()> {
 
     for line in &lines {
         let mut cur = 0;
-        let mut pass = String::new();
+        let mut pass: [u8; 8] = [0; 8];
+        let mut pos = 0;
+        let mut part1 = false;
         loop {
             let digest = md5::compute(format!("{line}{cur}"));
 
@@ -35,16 +37,20 @@ fn main() -> Result<()> {
                     if args.debug {
                         println!("Found at {cur} {digest:x}");
                     }
-                    pass = format!("{pass}{}", core::str::from_utf8(&[*x]).unwrap());
-                    if pass.len() >= 8 {
-                        break;
+                    pass[pos] = *x;
+                    pos += 1;
+                    if pos >= pass.len() {
+                        part1 = true;
                     }
                 }
                 _ => {}
             }
             cur += 1;
+            if part1 {
+                break;
+            }
         }
-        println!("part1: {pass}");
+        println!("part1: {}", core::str::from_utf8(&pass).unwrap());
     }
     Ok(())
 }
