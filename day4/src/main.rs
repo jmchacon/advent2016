@@ -37,10 +37,10 @@ fn main() -> Result<()> {
         for c in line.chars() {
             match c {
                 'a'..='z' => {
-                    if !checksum_on {
-                        names.entry(c).and_modify(|v| *v += 1).or_insert(1);
-                    } else {
+                    if checksum_on {
                         write!(checksum, "{c}").unwrap();
+                    } else {
+                        names.entry(c).and_modify(|v| *v += 1).or_insert(1);
                     }
                 }
                 '0'..='9' => {
@@ -62,30 +62,29 @@ fn main() -> Result<()> {
         }
 
         let mut is_real = true;
-        for i in 0..checksum.chars().count() - 1 {
+        let ck = checksum.chars().collect::<Vec<_>>();
+        for i in 0..ck.len() - 1 {
             // Don't do anything if both this char and the next aren't in the map
             // we assembled.
-            if names.contains_key(&checksum.chars().nth(i).unwrap()) {
-                if names.contains_key(&checksum.chars().nth(i + 1).unwrap()) {
-                    // Now check if the current is bigger than the next. If so, golden.
-                    // NOTE: Using nth() over and over isn't efficient but these are also
-                    //       tiny strings...
-                    let x = names.get(&checksum.chars().nth(i).unwrap()).unwrap();
-                    let y = names.get(&checksum.chars().nth(i + 1).unwrap()).unwrap();
-                    if x > y {
-                        continue;
-                    } else if x == y {
+            let cur = ck[i];
+            let next = ck[i + 1];
+            if names.contains_key(&cur) && names.contains_key(&next) {
+                // Now check if the current is bigger than the next. If so, golden.
+                let x = names.get(&cur).unwrap();
+                let y = names.get(&next).unwrap();
+                match x.cmp(y) {
+                    std::cmp::Ordering::Less => {}
+                    std::cmp::Ordering::Equal => {
                         // If instead the 2 chars have equal counts make sure they are in the
                         // checksum in alphabetical order.
-                        let c1 = checksum.chars().nth(i).unwrap();
-                        let c2 = checksum.chars().nth(i + 1).unwrap();
                         if args.debug {
-                            println!("x: {x} y: {y} c1: {c1} c2: {c2} {}", c1 < c2);
+                            println!("x: {x} y: {y} c1: {cur} c2: {next} {}", cur < next);
                         }
-                        if c1 < c2 {
+                        if cur < next {
                             continue;
                         }
                     }
+                    std::cmp::Ordering::Greater => continue,
                 }
             }
             // If we didn't pass this is a decoy.
