@@ -43,11 +43,15 @@ fn main() -> Result<()> {
         }
     }
     let mut out = Vec::new();
+    let mut part2 = Vec::new();
     for c in &cols {
         // Loop over the hash, invert it and then find the max and insert that char.
         let best = c.iter().map(|(k, v)| (v, k)).max().unwrap();
+        let worst = c.iter().map(|(k, v)| (v, k)).min().unwrap();
         out.push(*best.1);
+        part2.push(*worst.1);
     }
     println!("part1: {}", core::str::from_utf8(&out).unwrap());
+    println!("part2: {}", core::str::from_utf8(&part2).unwrap());
     Ok(())
 }
