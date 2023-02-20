@@ -57,8 +57,7 @@ fn is_tls(c: &[u8], debug: bool) -> bool {
         }
         if c[i] == b']' {
             // If we ever find one in a hypernet block it's always false.
-            if hypernet.is_some() {
-                let start = hypernet.unwrap();
+            if let Some(start) = hypernet {
                 let end = i;
                 if found >= start && found <= end {
                     return false;
