@@ -1,6 +1,7 @@
 //! day7 advent 20XX
 use clap::Parser;
 use color_eyre::eyre::Result;
+use std::collections::HashSet;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;
@@ -25,16 +26,23 @@ fn main() -> Result<()> {
     let lines: Vec<String> = io::BufReader::new(file).lines().flatten().collect();
 
     let mut cnt = 0;
+    let mut ssl_cnt = 0;
     for line in &lines {
         let tls = is_tls(line.as_bytes(), args.debug);
+        let ssl = is_ssl(line.as_bytes(), args.debug);
         if tls {
             cnt += 1;
         }
+        if ssl {
+            ssl_cnt += 1;
+        }
         if args.debug {
             println!("{line} TLS - {tls}");
+            println!("{line} SSL - {ssl}");
         }
     }
     println!("part1: {cnt}");
+    println!("part2: {ssl_cnt}");
     Ok(())
 }
 
@@ -70,4 +78,50 @@ fn is_tls(c: &[u8], debug: bool) -> bool {
         }
     }
     is_tls
+}
+
+fn is_ssl(c: &[u8], debug: bool) -> bool {
+    // ABA = letter, distinct, letter
+    // BAB = distinct, letter, distinct
+    //
+    // Find all the ABA and put in a hash
+    // Find all the BAB and put in a separate hash
+    // Loop over aba and see if bab corresponding is in other hash.
+    let mut abas = HashSet::new();
+    let mut babs = HashSet::new();
+
+    let mut hypernet = None;
+    for i in 0..c.len() - 2 {
+        if c[i] == b'[' {
+            hypernet = Some(i);
+            continue;
+        }
+        if c[i] == b']' {
+            hypernet = None;
+            continue;
+        }
+        if c[i] == c[i + 2] && c[i] != c[i + 1] {
+            let s = core::str::from_utf8(&c[i..i + 3]).unwrap();
+            if hypernet.is_some() {
+                babs.insert(s);
+            } else {
+                abas.insert(s);
+            }
+        }
+    }
+    if debug {
+        for a in &abas {
+            println!("ABA: {a}");
+        }
+        for b in &babs {
+            println!("BAB: {b}");
+        }
+    }
+    for a in &abas {
+        let b = a.as_bytes();
+        if babs.contains(core::str::from_utf8(&[b[1], b[0], b[1]]).unwrap()) {
+            return true;
+        }
+    }
+    false
 }
