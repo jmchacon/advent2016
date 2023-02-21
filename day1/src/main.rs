@@ -1,4 +1,5 @@
 //! day1 advent 20XX
+#![cfg_attr(feature = "cargo-clippy", allow(clippy::unwrap_used))]
 use crate::Direction::{East, North, South, West};
 use clap::Parser;
 use color_eyre::eyre::Result;

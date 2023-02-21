@@ -1,4 +1,5 @@
 //! day2 advent 20XX
+#![cfg_attr(feature = "cargo-clippy", allow(clippy::unwrap_used))]
 use crate::Move::{Down, Left, Right, Up};
 use clap::Parser;
 use color_eyre::eyre::Result;
