@@ -57,7 +57,6 @@ fn outer(c: &mut Chars, part2: bool) -> usize {
 }
 
 fn process(c: &mut Chars, part2: bool) -> usize {
-    let mut out = String::new();
     let mut n = String::new();
     // Find the number to copy.
     loop {
@@ -78,21 +77,19 @@ fn process(c: &mut Chars, part2: bool) -> usize {
         write!(n, "{cur}").unwrap();
     }
     let repeat = n.parse::<usize>().unwrap();
-    n.truncate(0);
 
     // Now pull in the next num chars and save them
     // into a string.
+    n.truncate(0);
     for _ in 0..num {
         let cur = c.next().unwrap();
         write!(n, "{cur}").unwrap();
     }
-    // Copy that string repeat times into the main output string.
-    for _ in 0..repeat {
-        write!(out, "{n}").unwrap();
+    // Either add up the strings or recurse N times.
+    if part2 && n.contains('(') {
+        let mut c = n.chars();
+        let sz = outer(&mut c, part2);
+        return repeat * sz;
     }
-    if part2 && out.contains('(') {
-        let mut c = out.chars();
-        return outer(&mut c, part2);
-    }
-    out.len()
+    repeat * n.len()
 }
