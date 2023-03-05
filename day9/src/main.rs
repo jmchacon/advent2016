@@ -29,14 +29,14 @@ fn main() -> Result<()> {
 
     for line in &lines {
         let mut c = line.chars();
-        println!("part1: {}", outer(&mut c, false));
+        println!("part1: {}", outer(&mut c, false, args.debug));
         let mut c = line.chars();
-        println!("part2: {}", outer(&mut c, true));
+        println!("part2: {}", outer(&mut c, true, args.debug));
     }
     Ok(())
 }
 
-fn outer(c: &mut Chars, part2: bool) -> usize {
+fn outer(c: &mut Chars, part2: bool, debug: bool) -> usize {
     let mut sz = 0;
     loop {
         let Some(cur) = c.next() else {
@@ -48,7 +48,7 @@ fn outer(c: &mut Chars, part2: bool) -> usize {
         // to copy the next A chars after the marker B times
         // and then continue as before.
         if cur == '(' {
-            sz += process(c, part2);
+            sz += process(c, part2, debug);
             continue;
         }
         sz += 1;
@@ -56,7 +56,7 @@ fn outer(c: &mut Chars, part2: bool) -> usize {
     sz
 }
 
-fn process(c: &mut Chars, part2: bool) -> usize {
+fn process(c: &mut Chars, part2: bool, debug: bool) -> usize {
     let mut n = String::new();
     // Find the number to copy.
     loop {
@@ -85,10 +85,13 @@ fn process(c: &mut Chars, part2: bool) -> usize {
         let cur = c.next().unwrap();
         write!(n, "{cur}").unwrap();
     }
+    if debug {
+        println!("Repeat {repeat} for string of length {}", n.len());
+    }
     // Either add up the strings or recurse N times.
     if part2 && n.contains('(') {
         let mut c = n.chars();
-        let sz = outer(&mut c, part2);
+        let sz = outer(&mut c, part2, debug);
         return repeat * sz;
     }
     repeat * n.len()
