@@ -179,8 +179,8 @@ fn main() -> Result<()> {
                 _ => panic!("{} - bad line {line}", line_num + 1),
             }
         }
-        write!(code, "{}", kp.0).unwrap();
-        write!(part2_code, "{:X}", strange_kp.0).unwrap();
+        write!(code, "{}", kp.0)?;
+        write!(part2_code, "{:X}", strange_kp.0)?;
     }
     println!("part1 - {code}");
     println!("part2 - {part2_code}");

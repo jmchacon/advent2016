@@ -51,7 +51,7 @@ fn main() -> Result<()> {
         out.push(*best.1);
         part2.push(*worst.1);
     }
-    println!("part1: {}", core::str::from_utf8(&out).unwrap());
-    println!("part2: {}", core::str::from_utf8(&part2).unwrap());
+    println!("part1: {}", core::str::from_utf8(&out)?);
+    println!("part2: {}", core::str::from_utf8(&part2)?);
     Ok(())
 }

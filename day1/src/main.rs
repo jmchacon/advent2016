@@ -54,7 +54,7 @@ fn main() -> Result<()> {
             );
             let mut chars = p.chars();
             let turn = chars.next().unwrap();
-            let num = chars.as_str().parse::<isize>().unwrap();
+            let num = chars.as_str().parse::<isize>()?;
             match turn {
                 'L' => {
                     dir = match dir {

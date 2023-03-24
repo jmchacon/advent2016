@@ -38,13 +38,13 @@ fn main() -> Result<()> {
             match c {
                 'a'..='z' => {
                     if checksum_on {
-                        write!(checksum, "{c}").unwrap();
+                        write!(checksum, "{c}")?;
                     } else {
                         names.entry(c).and_modify(|v| *v += 1).or_insert(1);
                     }
                 }
                 '0'..='9' => {
-                    write!(sector_id, "{c}").unwrap();
+                    write!(sector_id, "{c}")?;
                 }
                 '[' => {
                     checksum_on = true;
@@ -94,7 +94,7 @@ fn main() -> Result<()> {
             if args.debug {
                 println!("real - {line}");
             }
-            let id = sector_id.as_str().parse::<u32>().unwrap();
+            let id = sector_id.as_str().parse::<u32>()?;
             real += id;
 
             let mut decrypt = String::new();
@@ -102,16 +102,17 @@ fn main() -> Result<()> {
             for c in line.chars() {
                 match c {
                     'a'..='z' => {
-                        let new =
-                            std::char::from_u32((c as u32 - 'a' as u32 + id) % 26 + 'a' as u32)
-                                .unwrap();
-                        write!(decrypt, "{new}").unwrap();
+                        let new = std::char::from_u32(
+                            (u32::from(c) - u32::from('a') + id) % 26 + u32::from('a'),
+                        )
+                        .unwrap();
+                        write!(decrypt, "{new}")?;
                     }
                     '-' => {
-                        write!(decrypt, " ").unwrap();
+                        write!(decrypt, " ")?;
                     }
                     _ => {
-                        write!(decrypt, "{c}").unwrap();
+                        write!(decrypt, "{c}")?;
                     }
                 }
             }

@@ -44,8 +44,8 @@ fn main() -> Result<()> {
         if line.starts_with("rect") {
             let b = line.strip_prefix("rect ").unwrap();
             let cords = b.split_once('x').unwrap();
-            let x = cords.0.parse::<isize>().unwrap();
-            let y = cords.1.parse::<isize>().unwrap();
+            let x = cords.0.parse::<isize>()?;
+            let y = cords.1.parse::<isize>()?;
             for i in 0..x {
                 for j in 0..y {
                     grid.add(&Location(i, j), Pixel::On);
@@ -54,11 +54,11 @@ fn main() -> Result<()> {
         } else if line.starts_with("rotate column x=") {
             let c = line.strip_prefix("rotate column x=").unwrap();
             let cords = c.split_once(" by ").unwrap();
-            let x = cords.0.parse::<isize>().unwrap();
-            let count = cords.1.parse::<isize>().unwrap();
+            let x = cords.0.parse::<isize>()?;
+            let count = cords.1.parse::<isize>()?;
             let mut v = vec![Pixel::default(); args.height];
-            #[allow(clippy::cast_possible_wrap)]
-            for i in 0..args.height as isize {
+            let h: isize = args.height.try_into()?;
+            for i in 0..h {
                 match grid.get(&Location(x, i)) {
                     Pixel::On => {
                         #[allow(clippy::cast_sign_loss, clippy::cast_possible_wrap)]
@@ -69,21 +69,20 @@ fn main() -> Result<()> {
                 }
             }
             for (pos, p) in v.into_iter().enumerate() {
-                #[allow(clippy::cast_sign_loss, clippy::cast_possible_wrap)]
-                grid.add(&Location(x, pos as isize), p);
+                grid.add(&Location(x, pos.try_into()?), p);
             }
         } else if line.starts_with("rotate row y=") {
             let c = line.strip_prefix("rotate row y=").unwrap();
             let cords = c.split_once(" by ").unwrap();
-            let y = cords.0.parse::<isize>().unwrap();
-            let count = cords.1.parse::<isize>().unwrap();
+            let y = cords.0.parse::<isize>()?;
+            let count = cords.1.parse::<isize>()?;
             let mut v = vec![Pixel::default(); args.width];
-            #[allow(clippy::cast_possible_wrap)]
-            for i in 0..args.width as isize {
+            let w: isize = args.width.try_into()?;
+            for i in 0..w {
                 match grid.get(&Location(i, y)) {
                     Pixel::On => {
-                        #[allow(clippy::cast_sign_loss, clippy::cast_possible_wrap)]
-                        let new = (i + count) as usize % args.width;
+                        let loc: usize = (i + count).try_into()?;
+                        let new = loc % args.width;
                         v[new] = Pixel::On;
                     }
                     Pixel::Off => {}

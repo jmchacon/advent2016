@@ -64,8 +64,8 @@ fn main() -> Result<()> {
                 break;
             }
         }
-        println!("part1: {}", core::str::from_utf8(&pass).unwrap());
-        println!("part2: {}", core::str::from_utf8(&pass2).unwrap());
+        println!("part1: {}", core::str::from_utf8(&pass)?);
+        println!("part2: {}", core::str::from_utf8(&pass2)?);
     }
     Ok(())
 }

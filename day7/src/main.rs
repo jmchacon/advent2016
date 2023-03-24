@@ -28,8 +28,8 @@ fn main() -> Result<()> {
     let mut cnt = 0;
     let mut ssl_cnt = 0;
     for line in &lines {
-        let tls = is_tls(line.as_bytes(), args.debug);
-        let ssl = is_ssl(line.as_bytes(), args.debug);
+        let tls = is_tls(line.as_bytes(), args.debug)?;
+        let ssl = is_ssl(line.as_bytes(), args.debug)?;
         if tls {
             cnt += 1;
         }
@@ -46,7 +46,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn is_tls(c: &[u8], debug: bool) -> bool {
+fn is_tls(c: &[u8], debug: bool) -> Result<bool> {
     let mut hypernet = None;
     let mut is_tls = false;
     let mut found = 0;
@@ -60,7 +60,7 @@ fn is_tls(c: &[u8], debug: bool) -> bool {
             if let Some(start) = hypernet {
                 let end = i;
                 if found >= start && found <= end {
-                    return false;
+                    return Ok(false);
                 }
             }
             continue;
@@ -70,16 +70,16 @@ fn is_tls(c: &[u8], debug: bool) -> bool {
         // aaaa = no
         if c[i] == c[i + 3] && c[i + 1] == c[i + 2] && c[i] != c[i + 1] {
             if debug {
-                println!("Found {}", core::str::from_utf8(&c[i..i + 4]).unwrap());
+                println!("Found {}", core::str::from_utf8(&c[i..i + 4])?);
             }
             found = i;
             is_tls = true;
         }
     }
-    is_tls
+    Ok(is_tls)
 }
 
-fn is_ssl(c: &[u8], debug: bool) -> bool {
+fn is_ssl(c: &[u8], debug: bool) -> Result<bool> {
     // ABA = letter, distinct, letter
     // BAB = distinct, letter, distinct
     //
@@ -100,7 +100,7 @@ fn is_ssl(c: &[u8], debug: bool) -> bool {
             continue;
         }
         if c[i] == c[i + 2] && c[i] != c[i + 1] {
-            let s = core::str::from_utf8(&c[i..i + 3]).unwrap();
+            let s = core::str::from_utf8(&c[i..i + 3])?;
             if hypernet.is_some() {
                 babs.insert(s);
             } else {
@@ -118,9 +118,9 @@ fn is_ssl(c: &[u8], debug: bool) -> bool {
     }
     for a in &abas {
         let b = a.as_bytes();
-        if babs.contains(core::str::from_utf8(&[b[1], b[0], b[1]]).unwrap()) {
-            return true;
+        if babs.contains(core::str::from_utf8(&[b[1], b[0], b[1]])?) {
+            return Ok(true);
         }
     }
-    false
+    Ok(false)
 }

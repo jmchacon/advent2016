@@ -28,14 +28,14 @@ fn main() -> Result<()> {
 
     for line in &lines {
         let mut c = line.chars();
-        println!("part1: {}", outer(&mut c, false, args.debug));
+        println!("part1: {}", outer(&mut c, false, args.debug)?);
         let mut c = line.chars();
-        println!("part2: {}", outer(&mut c, true, args.debug));
+        println!("part2: {}", outer(&mut c, true, args.debug)?);
     }
     Ok(())
 }
 
-fn outer(c: &mut Chars, part2: bool, debug: bool) -> usize {
+fn outer(c: &mut Chars, part2: bool, debug: bool) -> Result<usize> {
     let mut sz = 0;
     loop {
         let Some(cur) = c.next() else {
@@ -47,15 +47,15 @@ fn outer(c: &mut Chars, part2: bool, debug: bool) -> usize {
         // to copy the next A chars after the marker B times
         // and then continue as before.
         if cur == '(' {
-            sz += process(c, part2, debug);
+            sz += process(c, part2, debug)?;
             continue;
         }
         sz += 1;
     }
-    sz
+    Ok(sz)
 }
 
-fn process(c: &mut Chars, part2: bool, debug: bool) -> usize {
+fn process(c: &mut Chars, part2: bool, debug: bool) -> Result<usize> {
     let mut n = String::new();
     // Find the number to copy.
     loop {
@@ -63,7 +63,7 @@ fn process(c: &mut Chars, part2: bool, debug: bool) -> usize {
         if cur == 'x' {
             break;
         }
-        write!(n, "{cur}").unwrap();
+        write!(n, "{cur}")?;
     }
     let num = n.parse::<usize>().unwrap();
     n.truncate(0);
@@ -73,7 +73,7 @@ fn process(c: &mut Chars, part2: bool, debug: bool) -> usize {
         if cur == ')' {
             break;
         }
-        write!(n, "{cur}").unwrap();
+        write!(n, "{cur}")?;
     }
     let repeat = n.parse::<usize>().unwrap();
 
@@ -82,7 +82,7 @@ fn process(c: &mut Chars, part2: bool, debug: bool) -> usize {
     n.truncate(0);
     for _ in 0..num {
         let cur = c.next().unwrap();
-        write!(n, "{cur}").unwrap();
+        write!(n, "{cur}")?;
     }
     if debug {
         println!("Repeat {repeat} for string of length {}", n.len());
@@ -90,8 +90,8 @@ fn process(c: &mut Chars, part2: bool, debug: bool) -> usize {
     // Either add up the strings or recurse N times.
     if part2 && n.contains('(') {
         let mut c = n.chars();
-        let sz = outer(&mut c, part2, debug);
-        return repeat * sz;
+        let sz = outer(&mut c, part2, debug)?;
+        return Ok(repeat * sz);
     }
-    repeat * n.len()
+    Ok(repeat * n.len())
 }

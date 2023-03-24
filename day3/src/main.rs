@@ -30,9 +30,9 @@ fn main() -> Result<()> {
         let parts = line.split_whitespace().collect::<Vec<_>>();
         assert!(parts.len() == 3, "{} - bad line {line}", line_num + 1);
 
-        let a = parts[0].parse::<u32>().unwrap();
-        let b = parts[1].parse::<u32>().unwrap();
-        let c = parts[2].parse::<u32>().unwrap();
+        let a = parts[0].parse::<u32>()?;
+        let b = parts[1].parse::<u32>()?;
+        let c = parts[2].parse::<u32>()?;
 
         // If these are lengths of the side of a triangle then 2 sides must
         // be bigger than the third.
