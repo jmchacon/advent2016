@@ -61,8 +61,8 @@ fn main() -> Result<()> {
             for i in 0..h {
                 match grid.get(&Location(x, i)) {
                     Pixel::On => {
-                        #[allow(clippy::cast_sign_loss, clippy::cast_possible_wrap)]
-                        let new = (i + count) as usize % args.height;
+                        let vv: usize = (i + count).try_into()?;
+                        let new = vv % args.height;
                         v[new] = Pixel::On;
                     }
                     Pixel::Off => {}
@@ -89,34 +89,34 @@ fn main() -> Result<()> {
                 }
             }
             for (pos, p) in v.into_iter().enumerate() {
-                #[allow(clippy::cast_sign_loss, clippy::cast_possible_wrap)]
-                grid.add(&Location(pos as isize, y), p);
+                grid.add(&Location(pos.try_into()?, y), p);
             }
         } else {
             panic!("{} - bad line {line}", line_num + 1);
         }
         if args.debug {
-            print_grid(&grid);
+            print_grid(&grid)?;
         }
     }
     let on = grid.iter().filter(|x| *x.1 == Pixel::On).count();
     println!("part1: {on}");
     println!("part2:");
-    print_grid(&grid);
+    print_grid(&grid)?;
     Ok(())
 }
 
-fn print_grid(grid: &Grid<Pixel>) {
+fn print_grid(grid: &Grid<Pixel>) -> Result<()> {
     for lc in grid {
         match lc.1 {
             Pixel::On => print!("#"),
             Pixel::Off => print!("."),
         }
 
-        #[allow(clippy::cast_sign_loss)]
-        if lc.0 .0 as usize == grid.width() - 1 {
+        let x: usize = lc.0 .0.try_into()?;
+        if x == grid.width() - 1 {
             println!();
         }
     }
     println!();
+    Ok(())
 }
