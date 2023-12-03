@@ -39,8 +39,8 @@ fn outer(c: &mut Chars, part2: bool, debug: bool) -> Result<usize> {
     let mut sz = 0;
     loop {
         let Some(cur) = c.next() else {
-                break;
-            };
+            break;
+        };
 
         // Normally we just copy char by char.
         // Unless this is a (AxB) marker which indicates
